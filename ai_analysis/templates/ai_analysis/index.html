@@ -1,0 +1,49 @@
+{% extends './base.html' %}
+{% block content %}
+        <form action='create' method='post'>
+            <table>
+                <tr>
+                    <td>
+                        {% csrf_token %}
+                        {{ pathform }}
+                    </td>
+                    <td>
+                        <input type = 'submit' value='analize'>
+                    </td>
+                </tr>
+            </table>
+        </form>
+        <p>{{ explanation }}</p>
+        {% if ai_analysis_log %}
+        <table class='table table-striped table-hover'>
+            <tr>
+                <td>image_path :</td>
+                <td>{{ai_analysis_log.image_path}}</td>
+            </tr>
+            <tr>
+                <td>success : </td>
+                <td>{{ai_analysis_log.success}}</td>
+            </tr>
+            <tr>
+                <td>message : </td>
+                <td>{{ai_analysis_log.message}}</td>
+            </tr>
+            <tr>
+                <td>cls : </td>
+                <td>{{ai_analysis_log.cls}}</td>
+            </tr>
+            <tr>
+                <td>confidence : </td>
+                <td>{{ai_analysis_log.confidence}}</td>
+            </tr>
+            <tr>
+                <td>request_timestamp : </td>
+                <td>{{ai_analysis_log.request_timestamp}}</td>
+            </tr>
+            <tr>
+                <td>response_timestamp : </td>
+                <td>{{ai_analysis_log.response_timestamp}}</td>
+            </tr>
+        </table>
+        {% endif %}
+{% endblock %}
