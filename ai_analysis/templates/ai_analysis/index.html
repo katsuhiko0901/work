@@ -1,19 +1,24 @@
 {% extends './base.html' %}
 {% block content %}
-        <form action='create' method='post'>
-            <table>
+        <p>解析したいファイルを選択して「解析」ボタンを押してください。</p>
+        <form action='create' method='post' enctype="multipart/form-data">
+            <table class='table'>
                 <tr>
                     <td>
                         {% csrf_token %}
-                        {{ pathform }}
+                        <!-- 2024/11/10 K.Matsuura UPD START -->
+                        <!-- {{ pathform }} -->
+                        {{ uploadfileform }}   
+                        <!-- 2024/11/10 K.Matsuura UPD END -->
                     </td>
                     <td>
-                        <input type = 'submit' value='analize'>
+                        <input type = 'submit' value='解析'>
                     </td>
                 </tr>
             </table>
         </form>
-        <p>{{ explanation }}</p>
+        <!-- 2024/11/10 K.Matsuura DEL -->
+        <!-- <p>{{ explanation }}</p> -->
         {% if ai_analysis_log %}
         <table class='table table-striped table-hover'>
             <tr>

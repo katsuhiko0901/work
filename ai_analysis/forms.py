@@ -1,5 +1,10 @@
 from django import forms 
 
+# URIをテキスト入力させるのは何か違う氣がする…
 class PathForm(forms.Form):
     PathForm = forms.CharField(required=True,label='image_path',max_length=255,strip=True,)
-    
+
+# 画像をアップロードしてそのURIを指定するように変更
+class UploadFileForm(forms.Form):
+    file = forms.ImageField()
+
