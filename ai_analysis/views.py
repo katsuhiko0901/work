@@ -65,7 +65,7 @@ def create(request):
     
     ai_analysis_log =  Ai_analysis_log()
 
-    # 正常終了以外はこの内容を画面表示（err = 1の場合はログ保存対象外とする）
+    # 初期値セット（正常終了の場合、これらの値は上書きされる）
     image_path = ''
     success = False
     message = 'Unexpected errors occuered'
@@ -83,32 +83,31 @@ def create(request):
             os.mkdir('img/' + save_dir)
             save_dir2 = get_random_string(17) 
             os.mkdir('img/' + save_dir + '/' + save_dir2)
+            # アップロード
             image_path = 'img/' + save_dir + '/' + save_dir2 + '/' + request.FILES['file'].name
             handle_uploaded_file(request.FILES['file'] , image_path)            
 
-            # url = 'http://example.com' # 本番用
+            # APIを呼び出す準備
             url = 'http://localhost:8000/api_mock/'
-
+            # url = 'http://example.com' # 本番用
             session = requests.session()    
-
             headers = {'Content-Type':'application/json'}
-
             data = {
                 "image_path": image_path
             }
-            print(data)
             json_data = json.dumps(data)
 
+            # APIを呼び出して結果を得る
             try:
                 response_data = session.post(url,data=json_data,headers=headers)
                 r = json.loads(response_data.text)
             
+                err = 0
                 success = r['success']
                 message = r['message']
                 if success == 'True' :
                     cls = r['estimated_data']['class']
                     confidence = r['estimated_data']['confidence']
-                    err = 0
             except Exception:
                 pass
         else:
@@ -117,6 +116,7 @@ def create(request):
         uploadfileform = UploadFileForm()
     # >>>--- 2024/11/10 K.Matsuura UPD END   
 
+    # DBに結果を保存
     # 2024/11/10 K.Matsuura DEL START --->>>    
     # pathform = PathForm()
     # >>>--- 2024/11/10 K.Matsuura DEL END    
@@ -127,11 +127,11 @@ def create(request):
     ai_analysis_log.cls = cls
     ai_analysis_log.confidence = confidence
     ai_analysis_log.request_timestamp = dt_now
-    ai_analysis_log.response_timestamp = dt_now
-    
+    ai_analysis_log.response_timestamp = dt_now   
     if err == 0:
         ai_analysis_log.save()
 
+    # ブラウザに結果を表示
     context = {
         # 2024/11/10 K.Matsuura UPD START --->>>
         # 'pathform':pathform ,
@@ -143,6 +143,7 @@ def create(request):
     return render(request,'ai_analysis/index.html', context)
 
 # 2024/11/10 K.Matsuura ADD START --->>>
+# ファイルのアップロード
 def handle_uploaded_file(file_obj, upload_path) :
     with open(upload_path, 'wb+') as destination:
         for chunk in file_obj.chunks() :
